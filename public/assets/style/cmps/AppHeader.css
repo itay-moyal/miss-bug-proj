@@ -1,0 +1,35 @@
+.app-header {
+    padding-block: 1em;
+    background-color: var(--gray2);
+    color: var(--clr-txt-dark);
+}
+
+.app-header > * {
+    align-items: center;
+    grid-row: 1;
+}
+
+.app-header h1 {
+    margin: 0;
+    justify-self: start;
+}
+
+.app-header nav {
+    display: flex;
+    gap: 1em;
+    justify-self: end;
+}
+
+.app-header nav a {
+    border-block-end: 1px solid transparent;
+    text-decoration: none;
+}
+
+.app-header nav a:hover {
+    color: var(--clr-txt-light);
+}
+
+.app-header nav a.active {
+    color: var(--clr-txt-light);
+    border-block-end: 1px solid var(--clr-txt-light);
+}

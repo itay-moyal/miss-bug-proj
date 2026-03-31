@@ -1,0 +1,19 @@
+.bug-filter {
+    display: flex;
+    align-items: center;
+
+    padding-block-end: 1em;
+    border-block-end: 1px solid lightgray;
+    margin-block-start: 1em;
+}
+
+.bug-filter p {
+    margin-inline-end: auto;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+:is(.bug-filter) label, input {
+    margin-inline-start: 1em;
+}
+

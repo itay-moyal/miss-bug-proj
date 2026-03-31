@@ -1,0 +1,26 @@
+.bug-details  {
+    row-gap: 1em;
+}
+
+.bug-details h2 {
+    margin: 1em 0;
+}
+
+.bug-details h3 {
+    font-size: 1.1em;
+}
+
+.bug-details .severity {
+    margin-block: 1em;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.bug-details .severity span{
+    color: var(--color3);
+}
+
+.bug-details button{
+    justify-self: end;
+    margin-block-start: 2em;
+}
