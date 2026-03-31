@@ -38,8 +38,10 @@ function save(bugToSave) {
     bugs[idx] = { ...bugs[idx], ...bugToSave }
   } else {
     bugToSave._id = makeId()
+    bugToSave.createdAt = Date.now()
     bugs.push(bugToSave)
   }
+  return _saveBugsToFile().then(() => bugToSave)
 }
 
 function _saveBugsToFile() {
