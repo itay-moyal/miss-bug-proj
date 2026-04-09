@@ -33,7 +33,7 @@ function remove(bugId) {
 }
 
 function save(bugToSave) {
-  if (bugToSave._id) {
+  if (bugToSave._id && bugToSave._id !== 'undefined') {
     const idx = bugs.findIndex((bug) => bug._id === bugToSave._id)
     bugs[idx] = { ...bugs[idx], ...bugToSave }
   } else {

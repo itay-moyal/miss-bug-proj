@@ -7,17 +7,17 @@
     "createdAt": null
   },
   {
-    "_id": "RsGL1",
-    "title": "Bug 1774948055719",
-    "description": "null",
-    "severity": 1,
-    "createdAt": null
-  },
-  {
     "_id": "jrqUG",
     "title": "Bug 1774948055719",
     "description": "hello there yes",
     "severity": 2,
+    "createdAt": null
+  },
+  {
+    "_id": "qQT6q",
+    "title": "Test",
+    "description": "Bugged Bug 12",
+    "severity": 4,
     "createdAt": null
   }
 ]
