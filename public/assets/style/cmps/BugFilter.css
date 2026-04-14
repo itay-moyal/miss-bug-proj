@@ -1,19 +1,39 @@
 .bug-filter {
-    display: flex;
-    align-items: center;
-
-    padding-block-end: 1em;
-    border-block-end: 1px solid lightgray;
-    margin-block-start: 1em;
+  padding: 1em;
 }
 
-.bug-filter p {
-    margin-inline-end: auto;
-    font-size: 1.1em;
-    font-weight: bold;
+.bug-filter h2 {
+  margin-bottom: 0.5em;
+  font-size: 1em;
 }
 
-:is(.bug-filter) label, input {
-    margin-inline-start: 1em;
+.bug-filter .filter-by {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
 }
 
+.sort-by {
+  display: flex;
+  align-items: center;
+  gap: 3em;
+  /* margin-block: .6em; */
+}
+
+.sort-field,
+.sort-dir {
+  display: flex;
+  align-items: center;
+  gap: 0.43em;
+}
+
+.sort-by,
+.filter-by {
+  border-block-end: 1px solid rgb(179, 179, 179);
+  padding-block: 0.4em;
+}
+
+:is(.sort-by, .filter-by) button {
+  margin-inline-start: auto;
+  font-size: 0.7em;
+}

@@ -1,22 +1,31 @@
 import express from "express"
+import path from "path"
+import cookieParser from "cookie-parser"
 import { bugService } from "./services/bug.service.js"
 import { loggerService } from "./services/logger.service.js"
 
 const app = express()
-app.use(express.static('public'))
+app.use(express.static("public"))
+app.use(cookieParser())
+app.use(express.json())
 
-app.get("/api/bug", (req, res) => {
-  bugService.query().then((bugs) => res.send(bugs))
-})
+// Support Arrays in query Params (req.query)
+app.set("query parser", "extended")
 
-app.get("/api/bug/save", (req, res) => {
-  const { _id, title, description, severity, createdAt } = req.query
+app.put("/api/bug/:bugId", (req, res) => {
+  const { _id, title, description, severity, labels } = req.body
+  if (!_id || !title || severity === undefined)
+    return res.status(400).send("Missing required fields")
   const bugToSave = {
     _id,
     title,
     description,
-    severity: +severity,
-    createdAt: +createdAt,
+    severity,
+    labels: labels || [],
+  }
+
+  for (const key in bugToSave) {
+    if (!bugToSave[key]) delete bugToSave[key]
   }
 
   bugService
@@ -28,8 +37,51 @@ app.get("/api/bug/save", (req, res) => {
     })
 })
 
+app.post("/api/bug", (req, res) => {
+  const { title, description, severity, labels } = req.body
+  if (!title || severity === undefined)
+    return res.status(400).send("Missing required fields")
+  const bugToSave = {
+    title,
+    description,
+    severity: +severity || 1,
+    lables: labels || [],
+  }
+
+  for (const key in bugToSave) {
+    if (!bugToSave[key]) delete bugToSave[key]
+  }
+
+  bugService
+    .save(bugToSave)
+    .then((savedBug) => res.send(savedBug))
+    .catch((err) => {
+      loggerService.error(err)
+      res.status(404).send("Can't save bug")
+    })
+})
+
+app.get("/api/bug", (req, res) => {
+  const queryOptions = parseQueryParams(req.query)
+  bugService
+    .query(queryOptions)
+    .then((bugs) => res.send(bugs))
+    .catch((err) => {
+      loggerService.error(err)
+      res.status(404).send("Can't get bugs")
+    })
+})
+
 app.get("/api/bug/:bugId", (req, res) => {
-  const bugId = req.params.bugId
+  const { bugId } = req.params
+  const { visitCountMap = [] } = req.cookies
+  console.log(visitCountMap)
+
+  if (visitCountMap.length === 3 && !visitCountMap.includes(bugId)) {
+    return res.status(401).send("Wait for a bit")
+  }
+  if (!visitCountMap.includes(bugId)) visitCountMap.push(bugId)
+  res.cookie("visitCountMap", visitCountMap, { maxAge: 1000 * 7 })
 
   bugService
     .get(bugId)
@@ -40,7 +92,7 @@ app.get("/api/bug/:bugId", (req, res) => {
     })
 })
 
-app.get("/api/bug/:bugId/remove", (req, res) => {
+app.delete("/api/bug/:bugId", (req, res) => {
   const bugId = req.params.bugId
   bugService
     .remove(bugId)
@@ -51,7 +103,31 @@ app.get("/api/bug/:bugId/remove", (req, res) => {
     })
 })
 
+app.get("{*splat}", (req, res) => {
+  res.sendFile(path.resolve("public/index.html"))
+})
+
 const port = 3030
 app.listen(port, () =>
   console.log(`Server listening on port http://127.0.0.1:${port}/`),
 )
+
+function parseQueryParams(queryParams) {
+  const filterBy = {
+    txt: queryParams.txt || "",
+    severity: +queryParams.severity || 0,
+    labels: queryParams.labels || [],
+  }
+  const sortBy = {
+    sortField: queryParams.sortField || "",
+    sortDir: +queryParams.sortDir || 1,
+  }
+  const pagination = {
+    pageIdx:
+      queryParams.pageIdx !== undefined
+        ? +queryParams.pageIdx || 0
+        : queryParams.pageIdx,
+    pageSize: +queryParams.pageSize || 3,
+  }
+  return { filterBy, sortBy, pagination }
+}

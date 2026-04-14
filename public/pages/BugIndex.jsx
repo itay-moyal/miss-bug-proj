@@ -1,21 +1,30 @@
-const { useState, useEffect } = React
+const { useState, useEffect, useRef } = React
 
 import { bugService } from "../services/bug.service.js"
 import { showSuccessMsg, showErrorMsg } from "../services/event-bus.service.js"
 
 import { BugFilter } from "../cmps/BugFilter.jsx"
 import { BugList } from "../cmps/BugList.jsx"
+import { debounce } from "../services/util.service.js"
+import { Pagination } from "../cmps/pagination.jsx"
 
 export function BugIndex() {
   const [bugs, setBugs] = useState(null)
+  const [pageCount, setPageCount] = useState()
   const [filterBy, setFilterBy] = useState(bugService.getDefaultFilter())
+
+  const debouncedSetFilterBy = useRef(debounce(setFilterBy, 400)).current
 
   useEffect(loadBugs, [filterBy])
 
   function loadBugs() {
     bugService
       .query(filterBy)
-      .then(setBugs)
+      .then((res) => {
+        // console.log(res)
+        setBugs(res.bug)
+        setPageCount(res.pageCount)
+      })
       .catch((err) => showErrorMsg(`Couldn't load bugs - ${err}`))
   }
 
@@ -51,11 +60,11 @@ export function BugIndex() {
     const newDescription = prompt("New description?", bug.description)
 
     const severity = newSeverity === null ? bug.severity : +newSeverity
-    const description = newDescription === null? bug.description : newDescription
+    const description =
+      newDescription === null ? bug.description : newDescription
     console.log(description)
-    
-    if (description === bug.description && severity === bug.severity) return
 
+    if (description === bug.description && severity === bug.severity) return
 
     const bugToSave = { ...bug, severity, description }
 
@@ -83,9 +92,15 @@ export function BugIndex() {
         <button onClick={onAddBug}>Add Bug</button>
       </header>
 
-      <BugFilter filterBy={filterBy} onSetFilterBy={onSetFilterBy} />
+      <BugFilter filterBy={filterBy} onSetFilterBy={debouncedSetFilterBy} />
 
       <BugList bugs={bugs} onRemoveBug={onRemoveBug} onEditBug={onEditBug} />
+
+      <Pagination
+        pageCount={pageCount}
+        filterBy={filterBy}
+        setFilterBy={setFilterBy}
+      />
     </section>
   )
 }

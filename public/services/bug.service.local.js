@@ -3,7 +3,7 @@ import { storageService } from './async-storage.service.js'
 
 const STORAGE_KEY = 'bugs'
 
-_createBugs()
+// _createBugs()
 
 export const bugService = {
     query,
