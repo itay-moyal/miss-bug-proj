@@ -3,7 +3,7 @@ import { makeId, readJsonFile, writeJsonFile } from "./util.service.js"
 const PATH = "./data/bug.json"
 const bugs = readJsonFile(PATH)
 
-console.log("bugs", bugs)
+// console.log("bugs", bugs)
 
 export const bugService = {
   query,

@@ -3,6 +3,8 @@ import path from "path"
 import cookieParser from "cookie-parser"
 import { bugService } from "./services/bug.service.js"
 import { loggerService } from "./services/logger.service.js"
+import { userService } from "./services/user.service.js"
+import { authService } from "./services/authService.js"
 
 const app = express()
 app.use(express.static("public"))
@@ -11,6 +13,37 @@ app.use(express.json())
 
 // Support Arrays in query Params (req.query)
 app.set("query parser", "extended")
+
+app.get("/api/bug", (req, res) => {
+  const queryOptions = parseQueryParams(req.query)
+  bugService
+    .query(queryOptions)
+    .then((bugs) => res.send(bugs))
+    .catch((err) => {
+      loggerService.error(err)
+      res.status(404).send("Can't get bugs")
+    })
+})
+
+app.get("/api/bug/:bugId", (req, res) => {
+  const { bugId } = req.params
+  const { visitCountMap = [] } = req.cookies
+  console.log(visitCountMap)
+
+  if (visitCountMap.length === 3 && !visitCountMap.includes(bugId)) {
+    return res.status(401).send("Wait for a bit")
+  }
+  if (!visitCountMap.includes(bugId)) visitCountMap.push(bugId)
+  res.cookie("visitCountMap", visitCountMap, { maxAge: 1000 * 7 })
+
+  bugService
+    .get(bugId)
+    .then((bug) => res.send(bug))
+    .catch((err) => {
+      loggerService.error(err)
+      res.status(404).send("Can't find bug")
+    })
+})
 
 app.put("/api/bug/:bugId", (req, res) => {
   const { _id, title, description, severity, labels } = req.body
@@ -61,37 +94,6 @@ app.post("/api/bug", (req, res) => {
     })
 })
 
-app.get("/api/bug", (req, res) => {
-  const queryOptions = parseQueryParams(req.query)
-  bugService
-    .query(queryOptions)
-    .then((bugs) => res.send(bugs))
-    .catch((err) => {
-      loggerService.error(err)
-      res.status(404).send("Can't get bugs")
-    })
-})
-
-app.get("/api/bug/:bugId", (req, res) => {
-  const { bugId } = req.params
-  const { visitCountMap = [] } = req.cookies
-  console.log(visitCountMap)
-
-  if (visitCountMap.length === 3 && !visitCountMap.includes(bugId)) {
-    return res.status(401).send("Wait for a bit")
-  }
-  if (!visitCountMap.includes(bugId)) visitCountMap.push(bugId)
-  res.cookie("visitCountMap", visitCountMap, { maxAge: 1000 * 7 })
-
-  bugService
-    .get(bugId)
-    .then((bug) => res.send(bug))
-    .catch((err) => {
-      loggerService.error(err)
-      res.status(404).send("Can't find bug")
-    })
-})
-
 app.delete("/api/bug/:bugId", (req, res) => {
   const bugId = req.params.bugId
   bugService
@@ -101,6 +103,43 @@ app.delete("/api/bug/:bugId", (req, res) => {
       loggerService.error(err)
       res.status(404).send("Can't find bug")
     })
+})
+
+// USER API
+
+app.post("/api/auth/signup", (req, res) => {
+  const credentials = req.body
+  // console.log(credentials)
+  userService
+    .add(credentials)
+    .then((user) => {
+      if (user) {
+        const loginToken = authService.getLoginToken(user)
+        res.cookie("loginToken", loginToken)
+        res.send(user)
+      } else {
+        res.status(400).send("Cannot Signup!")
+      }
+    })
+    .catch((err) => res.status(400).send("Username taken! ", err))
+})
+
+app.post("/api/auth/login", (req, res) => {
+  const credentials = req.body
+
+  authService
+    .checkLogin(credentials)
+    .then((user) => {
+      const loginToken = authService.getLoginToken(user)
+      res.cookie("loginToken", loginToken)
+      res.send(user)
+    })
+    .catch((err) => res.status(404).send("Invalid Credentials", err))
+})
+
+app.post("/api/auth/logout", (req, res) => {
+  res.clearCookie("loginToken")
+  res.send("Logged out.")
 })
 
 app.get("{*splat}", (req, res) => {
