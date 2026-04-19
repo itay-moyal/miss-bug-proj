@@ -1,4 +1,4 @@
-const BASE_URL = "/api/auth"
+const BASE_URL = "/api/auth/"
 const STORAGE_KEY_LOGGEDIN_USER = "loggedInUser"
 
 export const authService = {
@@ -11,19 +11,13 @@ export const authService = {
 function login({ username, password }) {
   return axios
     .post(BASE_URL + "login", { username, password })
-    .then((res) => {
-      console.log(res)
-      res.data
-    })
+    .then((res) => res.data)
     .then(_setLoggedinUser)
 }
 function signup({ username, password, fullname }) {
   return axios
     .post(BASE_URL + "signup", { username, password, fullname })
-    .then((res) => {
-      console.log(res)
-      res.data
-    })
+    .then((res) => res.data)
     .then(_setLoggedinUser)
 }
 function logout() {
