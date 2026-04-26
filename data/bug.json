@@ -1,82 +1,66 @@
 [
   {
-    "_id": "itk7d",
-    "title": "Bug 1774948055719",
-    "description": "null",
-    "severity": 1,
-    "createdAt": null
-  },
-  {
-    "_id": "jrqUG",
-    "title": "Bug 1774948055719",
-    "description": "hello there yes",
-    "severity": 2,
-    "createdAt": null
-  },
-  {
-    "title": "Test",
-    "description": "Hello Testing",
+    "title": "cc test",
+    "description": "cc test",
     "severity": 5,
-    "_id": "E2UIb",
-    "createdAt": 1775730039655
+    "lables": [],
+    "_id": "9dFSu",
+    "createdAt": 1777200794872,
+    "owner": {
+      "_id": "wfawE",
+      "fullname": "cc"
+    }
   },
   {
-    "title": "Testing too",
-    "description": "Hello Test",
-    "severity": 5,
-    "_id": "ZS6hq",
-    "createdAt": 1775730242423
-  },
-  {
-    "title": "Test that",
-    "description": "Testing",
-    "severity": 6,
-    "_id": "MsZYU",
-    "createdAt": 1775730307382
-  },
-  {
-    "title": "Test",
-    "description": "Testing",
-    "severity": 55,
-    "_id": "0kMa9",
-    "createdAt": 1775730562321
-  },
-  {
-    "title": "Rest API Test",
-    "description": "Testing put/post method",
+    "title": "Testing again",
+    "description": "Bob is an admin",
     "severity": 4,
-    "_id": "iTmn6",
-    "createdAt": 1776177909849
+    "lables": [],
+    "_id": "wFO9p",
+    "createdAt": 1777200827082,
+    "owner": {
+      "username": "bob",
+      "fullname": "bob",
+      "isAdmin": true,
+      "_id": "GOtHH"
+    },
+    "labels": []
   },
   {
-    "title": "Test",
-    "description": "213",
+    "title": "Bob test",
+    "description": "Testing with bob the admin",
     "severity": 5,
-    "_id": "9dzxK",
-    "createdAt": 1776178746450
+    "lables": [],
+    "_id": "4GzxM",
+    "createdAt": 1777200871471,
+    "owner": {
+      "_id": "GOtHH",
+      "fullname": "bob",
+      "isAdmin": true
+    }
   },
   {
-    "title": "Bug 1776188563093",
+    "title": "cc test bugs",
     "description": "test",
     "severity": 3,
     "lables": [],
-    "_id": "JHSK0",
-    "createdAt": 1776188568404
+    "_id": "MgIFs",
+    "createdAt": 1777201222316,
+    "owner": {
+      "_id": "wfawE",
+      "fullname": "cc"
+    }
   },
   {
-    "title": "testing",
-    "description": "labels",
+    "title": "test",
+    "description": "cc test",
     "severity": 5,
     "lables": [],
-    "_id": "onmm3",
-    "createdAt": 1776189567345
-  },
-  {
-    "title": "Bug Postman",
-    "description": "null",
-    "severity": 1,
-    "lables": [],
-    "_id": "Yh5oU",
-    "createdAt": 1776410123874
+    "_id": "anKjC",
+    "createdAt": 1777202142922,
+    "owner": {
+      "_id": "wfawE",
+      "fullname": "cc"
+    }
   }
 ]

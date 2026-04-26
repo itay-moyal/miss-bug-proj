@@ -12,6 +12,7 @@ import { BugIndex } from "./pages/BugIndex.jsx"
 import { BugDetails } from "./pages/BugDetails.jsx"
 import { AboutUs } from "./pages/AboutUs.jsx"
 import { LoginSignup } from "./pages/LoginSignup.jsx"
+import { UserDetails } from "./pages/UserDetails.jsx"
 
 export function App() {
   const [loggedinUser, setLoggedinUser] = useState(
@@ -35,6 +36,7 @@ export function App() {
               path="/auth"
               element={<LoginSignup setLoggedinUser={setLoggedinUser} />}
             />
+            <Route path="/user/:userId" element={<UserDetails />} />
           </Routes>
         </main>
         <AppFooter />

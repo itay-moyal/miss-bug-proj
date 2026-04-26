@@ -87,14 +87,14 @@ export function LoginSignup({ setLoggedinUser }) {
           />
         )}
         <button>{isSignup ? "Signup" : "Login"}</button>
+        <div className="login-auth">
+          <a href="#" onClick={() => setIsSignup(!isSignup)}>
+            {isSignup
+              ? "Already a member? Login!"
+              : "New user? Signup over here!"}
+          </a>
+        </div>
       </form>
-      <div className="auth-toggle">
-        <a href="#" onClick={() => setIsSignup(!isSignup)}>
-          {isSignup
-            ? "Already a member? Login!"
-            : "New user? Signup over here!"}
-        </a>
-      </div>
     </div>
   )
 }

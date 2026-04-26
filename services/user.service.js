@@ -24,8 +24,8 @@ function query() {
 
 function getUserById(userId) {
   return new Promise((resolve, reject) => {
-    const user = users.find((user) => user._id === userId)
-    if (!user) return reject("User not found!")
+    let user = users.find((user) => user._id === userId)
+    if (!user) reject("User not found!")
     user = { ...user }
     delete user.password
     resolve(user)

@@ -1,0 +1,21 @@
+.login-page {
+  display: flex;
+  justify-content: center;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+
+  width: min(240px, 40%);
+
+  padding: 1em;
+  border: 1px solid lightgray;
+  margin-block-start: 100px;
+}
+
+.login-auth {
+  text-align: center;
+  font-size: 0.8em;
+}

@@ -6,6 +6,8 @@ import { loggerService } from "./services/logger.service.js"
 import { userService } from "./services/user.service.js"
 import { authService } from "./services/authService.js"
 
+//TODO : Only the bug's creator can DELETE/UPDATE a bug.
+
 const app = express()
 app.use(express.static("public"))
 app.use(cookieParser())
@@ -13,6 +15,8 @@ app.use(express.json())
 
 // Support Arrays in query Params (req.query)
 app.set("query parser", "extended")
+
+// BUGS REST API
 
 app.get("/api/bug", (req, res) => {
   const queryOptions = parseQueryParams(req.query)
@@ -46,7 +50,10 @@ app.get("/api/bug/:bugId", (req, res) => {
 })
 
 app.put("/api/bug/:bugId", (req, res) => {
-  const { _id, title, description, severity, labels } = req.body
+  const loggedinUser = authService.validateToken(req.cookies.loginToken)
+  if (!loggedinUser) return res.status(401).send("Unauthenticated!")
+
+  const { _id, title, description, severity, labels, owner } = req.body
   if (!_id || !title || severity === undefined)
     return res.status(400).send("Missing required fields")
   const bugToSave = {
@@ -55,6 +62,7 @@ app.put("/api/bug/:bugId", (req, res) => {
     description,
     severity,
     labels: labels || [],
+    owner: loggedinUser,
   }
 
   for (const key in bugToSave) {
@@ -62,7 +70,7 @@ app.put("/api/bug/:bugId", (req, res) => {
   }
 
   bugService
-    .save(bugToSave)
+    .save(bugToSave, loggedinUser)
     .then((savedBug) => res.send(savedBug))
     .catch((err) => {
       loggerService.error(err)
@@ -71,6 +79,9 @@ app.put("/api/bug/:bugId", (req, res) => {
 })
 
 app.post("/api/bug", (req, res) => {
+  const loggedinUser = authService.validateToken(req.cookies.loginToken)
+  if (!loggedinUser) return res.status(401).send("Unauthenticated!")
+
   const { title, description, severity, labels } = req.body
   if (!title || severity === undefined)
     return res.status(400).send("Missing required fields")
@@ -86,7 +97,7 @@ app.post("/api/bug", (req, res) => {
   }
 
   bugService
-    .save(bugToSave)
+    .save(bugToSave, loggedinUser)
     .then((savedBug) => res.send(savedBug))
     .catch((err) => {
       loggerService.error(err)
@@ -95,9 +106,12 @@ app.post("/api/bug", (req, res) => {
 })
 
 app.delete("/api/bug/:bugId", (req, res) => {
-  const bugId = req.params.bugId
+  const loggedinUser = authService.validateToken(req.cookies.loginToken)
+  if (!loggedinUser) return res.status(401).send("Unauthenticated!")
+
+  const { bugId } = req.params
   bugService
-    .remove(bugId)
+    .remove(bugId, loggedinUser)
     .then(() => res.send("Removed!"))
     .catch((err) => {
       loggerService.error(err)
@@ -106,10 +120,32 @@ app.delete("/api/bug/:bugId", (req, res) => {
 })
 
 // USER API
+app.get("/api/user", (req, res) => {
+  userService
+    .query()
+    .then((users) => res.send(users))
+    .catch((err) => {
+      loggerService.error("Cannot load users", err)
+      res.status(400).send("Cannot load users.")
+    })
+})
+
+app.get("/api/user/:userId", (req, res) => {
+  const { userId } = req.params
+
+  userService
+    .getUserById(userId)
+    .then((user) => res.send(user))
+    .catch((err) => {
+      loggerService.error("Cannot load user", err)
+      res.status(400).send("Cannot load user.")
+    })
+})
+
+//AUTH API
 
 app.post("/api/auth/signup", (req, res) => {
   const credentials = req.body
-  // console.log(credentials)
   userService
     .add(credentials)
     .then((user) => {
@@ -156,6 +192,7 @@ function parseQueryParams(queryParams) {
     txt: queryParams.txt || "",
     severity: +queryParams.severity || 0,
     labels: queryParams.labels || [],
+    ownerId: queryParams.ownerId || "",
   }
   const sortBy = {
     sortField: queryParams.sortField || "",

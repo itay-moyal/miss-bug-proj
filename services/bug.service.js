@@ -1,3 +1,4 @@
+import { log } from "console"
 import { makeId, readJsonFile, writeJsonFile } from "./util.service.js"
 
 const PATH = "./data/bug.json"
@@ -35,6 +36,12 @@ function query(queryOptions = {}) {
     )
   }
 
+  if (filterBy.ownerId) {
+    returnedBugs = returnedBugs.filter(
+      (bug) => bug.owner._id === filterBy.ownerId,
+    )
+  }
+
   if (sortBy.sortField === "severity" || sortBy.sortField === "createdAt") {
     const { sortField, sortDir } = sortBy
     returnedBugs.sort(
@@ -66,20 +73,29 @@ function get(bugId) {
   })
 }
 
-function remove(bugId) {
+function remove(bugId, loggedinUser) {
   const idx = bugs.findIndex((bug) => bug._id === bugId)
+  if (idx === -1) return Promise.reject("No such bug.")
+  if (!loggedinUser.isAdmin && bugs[idx].owner._id !== loggedinUser._id)
+    return Promise.reject("Not the owner of the bug.")
 
   bugs.splice(idx, 1)
   return _saveBugsToFile()
 }
 
-function save(bugToSave) {
+function save(bugToSave, loggedinUser) {
   if (bugToSave._id) {
     const idx = bugs.findIndex((bug) => bug._id === bugToSave._id)
+
+    if (idx === -1) return Promise.reject("No such bug.")
+    if (!loggedinUser.isAdmin && bugs[idx].owner._id !== loggedinUser._id)
+      return Promise.reject("Not the owner of the bug.")
+
     bugs[idx] = { ...bugs[idx], ...bugToSave }
   } else {
     bugToSave._id = makeId()
     bugToSave.createdAt = Date.now()
+    bugToSave.owner = _extractOwnerDetails(loggedinUser)
     bugs.push(bugToSave)
   }
   return _saveBugsToFile().then(() => bugToSave)
@@ -87,4 +103,11 @@ function save(bugToSave) {
 
 function _saveBugsToFile() {
   return writeJsonFile(PATH, bugs)
+}
+
+function _extractOwnerDetails(user) {
+  const { _id, fullname, isAdmin } = user
+  const owner = { _id, fullname, isAdmin }
+  if (isAdmin) owner.isAdmin = isAdmin
+  return owner
 }

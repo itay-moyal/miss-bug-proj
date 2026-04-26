@@ -7,8 +7,10 @@ import { BugFilter } from "../cmps/BugFilter.jsx"
 import { BugList } from "../cmps/BugList.jsx"
 import { debounce } from "../services/util.service.js"
 import { Pagination } from "../cmps/pagination.jsx"
+import { authService } from "../services/auth.service.front.js"
 
 export function BugIndex() {
+  const loggedinUser = authService.getLoggedinUser()
   const [bugs, setBugs] = useState(null)
   const [pageCount, setPageCount] = useState()
   const [filterBy, setFilterBy] = useState(bugService.getDefaultFilter())
@@ -61,7 +63,9 @@ export function BugIndex() {
 
     const severity = newSeverity === null ? bug.severity : +newSeverity
     const description =
-      newDescription === null ? bug.description : newDescription
+      newDescription === null || newDescription === undefined
+        ? bug.description
+        : newDescription
     console.log(description)
 
     if (description === bug.description && severity === bug.severity) return
@@ -89,12 +93,17 @@ export function BugIndex() {
     <section className="bug-index main-content">
       <header>
         <h2>Bug List</h2>
-        <button onClick={onAddBug}>Add Bug</button>
+        {loggedinUser && <button onClick={onAddBug}>Add Bug</button>}
       </header>
 
       <BugFilter filterBy={filterBy} onSetFilterBy={debouncedSetFilterBy} />
 
-      <BugList bugs={bugs} onRemoveBug={onRemoveBug} onEditBug={onEditBug} />
+      <BugList
+        bugs={bugs}
+        onRemoveBug={onRemoveBug}
+        onEditBug={onEditBug}
+        loggedinUser={loggedinUser}
+      />
 
       <Pagination
         pageCount={pageCount}
